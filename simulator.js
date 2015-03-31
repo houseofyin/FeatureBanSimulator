@@ -79,6 +79,7 @@ function initBoard()
 
 function captureCummulativeFlowMetrics(round)
 {
+	var currentStage;
 	for (currentStage = 0; currentStage < stages; currentStage++)
 	{
 		cummulativeFlowMetrics[round][currentStage] = board[currentStage].length;
@@ -124,7 +125,7 @@ var colors = d3.scale.category10();
 
 var x = d3.scale.linear()
     .range([0, width])
-    .domain([0,9]);
+    .domain([0,rounds-1]);
 
 var y = d3.scale.linear()
     .range([height, 0])
