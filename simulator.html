@@ -7,27 +7,43 @@
 <body>
 </body>
 
+<h1>FeatureBan Simulator</h1>
+<p>This simulator serves two purposes.  One, it provides
+a tool to explore possible outcomes if facilitators want
+to alter any of the basic rules of the simulation.  Two, 
+it can be used as part of debriefing the simulation,
+by letting facilitators help participants explore alternate
+scenarios that they didn't explore during the FeatureBan activity.</p1>
+
+<p>To use, select the desired paramters.  The default parameters
+are suitable for a baseline. Then click the Run Simulation button</p>
+
+<p>The simulator will produce two results.  First it will calculate
+the average lead time and average number of work items completed
+across ALL of the simulations just executed.  It will also produce
+a cumulative flow diagram of the LAST simulation as an illustration.<p>
+
 <h3 id="parameters">Simulation Parameters</h3>
 
  <label for="stages">Stages:</label>
-  <input type="text" name="stages" id="stages" value="4"><br>
+  <input type="text" name="stages" id="stages" value="4">How many stages should be on the Kanban board.<br>
 <label for="rounds">Rounds:</label>
-  <input type="text" name="rounds" id="rounds" value="10"><br>
-<label for="minimumToUnblock">Minimum to Unblock:</label>
-  <input type="text" name="minimumToUnblock" id="minimumToUnblock" value="4"><br>
+  <input type="text" name="rounds" id="rounds" value="10">How many rounds of die-rolling should be included in each simulation.<br>
+<label for="minimumToUnblock">Minimum to Succeed:</label>
+  <input type="text" name="minimumToUnblock" id="minimumToUnblock" value="4">On a 6-sided die, on what value should be counted as a success result.  Lower than this is considered a block.  e.g. a 4 is a 50/50 split.<br>
 <label for="workers">Workers:</label>
-  <input type="text" name="workers" id="workers" value="5"><br>
+  <input type="text" name="workers" id="workers" value="5">How many people should be included in each simulation.<br>
 <label for="workItemsPerWorker">Work Items per Workers:</label>
-	<input type="text" name="workItemsPerWorker" id="workItemsPerWorker" value="10"><br>
+	<input type="text" name="workItemsPerWorker" id="workItemsPerWorker" value="10">This is used to determine how many simulated cards should be initialized.<br>
 <label for="simulations">Number of Simulations:</label>
-	<input type="text" name="simulations" id="simulations" value="100"><br>
+	<input type="text" name="simulations" id="simulations" value="100">How many times the simulation should be run.  If you are only interested in the cummulative flow diagram, 1 is sufficient.  The metrics stablize around 1000 simulations.<br>
 <label for="wipLimits">WiPLimits (Comma Separated):</label>
-	<input type="text" name="wipLimits" id="wipLimits" value="35,35"><br>
+	<input type="text" name="wipLimits" id="wipLimits" value="35,35">A comma separated list of WiP limits for all of the stages, except for the first and the last.  E.g. if there are 4 stages selected above, there should be two listed here.  The defaults are set to be high enough that there should be in practice no effective limits.<br>
 <label for="collaboation">Use Team Collaboration to Optimize Order of Work:</label>
 	<select  name="collaboation" id="collaboation" >
 	   <option value="false">False</option>
 	   <option value="true">True</option>
-	</select><br> 
+	</select>There are some differences in outcome based on how well the team works together.  You need to run with a large number of simulations to see the effect reliably.<br> 
 
 <button type="button" id="start" onClick="simulate()">Run Simulation</button>
   
@@ -37,9 +53,9 @@
 <h3 id="averageCompleted">Cummulative Flow Diagram from the Last Simulation<h3>
 <div id='chart'></div>
 
-<h3 id="metrics">Before JavaScript</h3>
+<h3 id="metrics"></h3>
 
 
-<h3 id="board">Before JavaScript</h3> 
+<h3 id="board"></h3> 
 
 </html>
