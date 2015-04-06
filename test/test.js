@@ -74,6 +74,237 @@ QUnit.test( "init board", function( assert ) {
   	  assert.ok(currentResult <=6,currentResult);
   }
 });
-		
+
+var fixedRoller = function(rollResult) {
+	return function()
+	{   
+		return rollResult;
+	}
+	}
+
+QUnit.test( "work", function( assert ) {
+  minimumToUnblock = 4;
+  roll = fixedRoller(3);
+  assert.ok(!work());
+  roll = fixedRoller(1);
+  assert.ok(!work());
+  roll = fixedRoller(4);
+  assert.ok(work());
+  roll = fixedRoller(6);
+  assert.ok(work());
+  minimumToUnblock = 2;
+  roll = fixedRoller(1);
+  assert.ok(!work());
+  roll = fixedRoller(2);
+  assert.ok(work());
+});
+
+QUnit.test( "start new work item", function( assert ) {
+ board = [[{},{},{}],[]];
+ wipLimits = [35,1];
+ var workDone = startNewWorkItem("A",2);
+ assert.equal( board[0].length, 2);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[1][0].worker, "A");
+ assert.equal( board[1][0].started, 2);
+ assert.ok(workDone);
+ workDone = startNewWorkItem("B",3);
+ assert.equal( board[0].length, 2);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[1][0].worker, "A");
+ assert.equal( board[1][0].started, 2);
+ assert.ok(!workDone);
+});
+
+QUnit.test( "processSuccess", function( assert ) {
+ stages = 4;
+ wipLimits = [35,1,1,35];
+ board = [[{},{},{}],[],[],[]];
+ processSuccess("C",1,false);
+ assert.equal( board[0].length, 2);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 0);
+ assert.equal( board[1][0].started, 1);
+ 
+ workDone = processSuccess("B",1,false);
+ assert.equal( board[0].length, 2);
+ assert.equal( board[1].length, 0);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 0);
+ 
+ workDone = processSuccess("B",2,true);
+ assert.equal( board[0].length, 2);
+ assert.equal( board[1].length, 0);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 1);
+ assert.equal( board[3][0].finished, 2);
+ assert.equal( board[3][0].started, 1);
+ assert.ok(!board[3][0].blocked);
+ 
+ processBlock("C",2);
+ assert.equal( board[0].length, 1);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 1);
+ assert.equal( board[1][0].started, 2);
+
+ processBlock("C",3);
+ 
+ workDone = processSuccess("B",3,false);
+ assert.equal( board[0].length, 1);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 1);
+ 
+ processBlock("B",4);
+ assert.equal( board[0].length, 1);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 1);
+ 
+ workDone = processSuccess("C",4,false);
+ assert.equal( board[0].length, 1);
+ assert.equal( board[1].length, 0);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 1);
+ 
+ workDone = processSuccess("A",5,false);
+ assert.equal( board[0].length, 0);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 1);
+ 
+ workDone = processSuccess("A",5,true);
+ assert.equal( board[0].length, 0);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 2);
+ assert.equal( board[3][1].finished, 5);
+ assert.equal( board[3][1].started, 2);
+ 
+ assert.ok(!board[3][0].blocked);
+ assert.ok(!board[3][1].blocked);
+ 
+});
+
+QUnit.test( "processMove", function( assert ) {
+ stages = 4;
+ wipLimits = [35,1,1,35];
+ board = [[{}],[{worker: "A", blocked:false}], 
+              [{worker: "B", blocked:true}],[]];
+ var workDone = processMove("C",2,false);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 0);
+ assert.ok(!workDone);
+ 
+ workDone = processMove("A",2,false);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 0);
+ assert.ok(!workDone);
+
+ workDone = processUnblock("C",true);
+ workDone = processMove("B",2,false);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 1);
+ assert.equal( board[3][0].finished, 2);
+ 
+ assert.ok(workDone);
+ 
+ workDone = processMove("B",2,true);
+ assert.equal( board[1].length, 0);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 1);
+ assert.ok(workDone); 
+
+ 
+});	
+
+QUnit.test( "processUnblock", function( assert ) {
+ stages = 3;
+ board = [[{}],[{worker: "A", blocked:false}, 
+              {worker: "A", blocked:true}, 
+ 			  {worker: "B", blocked:true}],[]];
+ var workDone = processUnblock("C",false);
+ assert.equal( board[1][0].blocked, false);
+ assert.equal( board[1][1].blocked, true);
+ assert.equal( board[1][2].blocked, true);
+ assert.ok(!workDone);
+ 
+ workDone = processUnblock("A",false);
+ assert.equal( board[1][0].blocked, false);
+ assert.equal( board[1][1].blocked, false);
+ assert.equal( board[1][2].blocked, true);
+ assert.ok(workDone);
+
+ workDone = processUnblock("C",true);
+ assert.equal( board[1][0].blocked, false);
+ assert.equal( board[1][1].blocked, false);
+ assert.equal( board[1][2].blocked, false);
+ assert.ok(workDone);
+
+ 
+});	
+
+QUnit.test( "processBlock", function( assert ) {
+ stages = 3;
+ board = [[{}],[{worker: "A", blocked:false}, 
+              {worker: "A", blocked:true}, 
+ 			  {worker: "B", blocked:true}],[]];
+ processBlock("C",2);
+ assert.equal( board[1][0].blocked, false);
+ assert.equal( board[1][1].blocked, true);
+ assert.equal( board[1][2].blocked, true);
+
+ processBlock("A",2);
+ assert.equal( board[1][0].blocked, true);
+ assert.equal( board[1][1].blocked, true);
+ assert.equal( board[1][2].blocked, true);
+
+});	
+
+var rollCount = 0;
+
+var fixedRangedRoller = function(rollResults) {
+	return function()
+	{   
+		return rollResults[rollCount++];
+	}
+	}
+
+QUnit.test( "processSelfishApproach", function( assert ) {
+ stages = 4;
+ workers = 2;
+ minimumToUnblock = 4;
+ board = [[{},{},{},{}],[],[],[]];
+ wipLimits = [35,1,1,35];
+ 
+ roll = fixedRangedRoller([6,6,6,1,6,1]);
+ selfishApproachToProcessingOneRound(1);
+ assert.equal( board[0].length, 3);
+ assert.equal( board[1].length, 0);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 0);
+ 
+ selfishApproachToProcessingOneRound(2);
+ assert.equal( board[0].length, 2);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 0);
+ assert.equal( board[3].length, 1); 
+
+ selfishApproachToProcessingOneRound(3);
+ assert.equal( board[0].length, 1);
+ assert.equal( board[1].length, 1);
+ assert.equal( board[2].length, 1);
+ assert.equal( board[3].length, 1); 
+ assert.equal( board[2][0].blocked, true);
+
+});	
+
+//TODO Test Selfish v Cooperative
+
 	
 

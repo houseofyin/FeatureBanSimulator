@@ -250,21 +250,17 @@ function work()
 
 function startNewWorkItem(worker,round)
 {
-if (typeof round === "undefined")
-{
-	console.log("Stop here");
-}
 
 	var workDone = false;
 	if (board[1].length < wipLimits[1])
 	{
-
 	     var nextWorkItem = board[0].pop();
 	     if (typeof nextWorkItem === "undefined") {
 	     	 throw new Error("Oops. Ran out of work to do.");
     	 }
 	     nextWorkItem.worker = worker;
 	     nextWorkItem.started = round;
+	     nextWorkItem.blocked = false;
 		 board[1].push(nextWorkItem);
 		 workDone = true;
 	}
@@ -274,8 +270,56 @@ if (typeof round === "undefined")
 function processSuccess(worker,round, helpOthers)
 {
 	var currentStage, currentItem;
+	var workDone = processUnblock(worker, helpOthers);
+	if (!workDone)
+	{
+		workDone = processMove(worker,round, helpOthers);
+	}
+	if (!workDone)
+	{
+		workDone = startNewWorkItem(worker,round);
+	}
+	if (!helpOthers & !workDone)
+	{
+		processSuccess(worker,round, true);
+	}
+	
+}
+
+function processMove(worker,round, helpOthers)
+{
 	var workDone = false;
-	//Try to unblock an item
+		stageLoopForMoves:
+		for (currentStage = stages-2; currentStage > 0; currentStage--)
+		{
+			for (currentItem = 0; currentItem < board[currentStage].length; currentItem++)
+			{
+				if (board[currentStage][currentItem].worker === worker || helpOthers)
+				{
+					if (board[currentStage+1].length < wipLimits[currentStage+1])
+					{
+						if (currentStage+2 === stages)
+						{
+							board[currentStage][currentItem].finished = round;
+							totalFinished++;
+							totalLeadTime += board[currentStage][currentItem].finished - board[currentStage][currentItem].started;	
+						}
+						board[currentStage+1].push(board[currentStage][currentItem]);
+						board[currentStage].splice(currentItem,1);
+						workDone = true;
+						break stageLoopForMoves;
+					}
+				}
+			}
+		}
+
+	return workDone;
+}
+
+
+function processUnblock(worker, helpOthers)
+{
+	var workDone = false;
 	stageLoopForBlocks:
 	for (currentStage = stages-2; currentStage >= 0; currentStage--)
 	{
@@ -290,46 +334,9 @@ function processSuccess(worker,round, helpOthers)
 			}
 		}
 	}
-	if (!workDone)
-	{
-		stageLoopForMoves:
-		for (currentStage = stages-2; currentStage > 0; currentStage--)
-		{
-			for (currentItem = 0; currentItem < board[currentStage].length; currentItem++)
-			{
-				if (board[currentStage][currentItem].worker === worker || helpOthers)
-				{
-					if (board[currentStage+1].length < wipLimits[currentStage+1])
-					{
-						if (currentStage+2 === stages)
-						{
-console.log("Finished an item [" + board[currentStage][currentItem].name + "] owner:" + board[currentStage][currentItem].worker + " me:" + worker); 						
-							
-							board[currentStage][currentItem].finished = round;
-							totalFinished++;
-							totalLeadTime += board[currentStage][currentItem].finished - board[currentStage][currentItem].started;	
-						}
-console.log("Moved an item to [" + board[currentStage][currentItem].name + "][" + (currentStage + 1) + "] owner:" + board[currentStage][currentItem].worker + " me:" + worker); 						
-console.log("Cards in target [" + board[currentStage+1].length + "] WiP Limit at Target:" + wipLimits[currentStage+1]); 						
-						board[currentStage+1].push(board[currentStage][currentItem]);
-						board[currentStage].splice(currentItem,1);
-						workDone = true;
-						break stageLoopForMoves;
-					}
-				}
-			}
-		}
-	}
-	if (!workDone)
-	{
-		workDone = startNewWorkItem(worker,round);
-	}
-	if (!helpOthers & !workDone)
-	{
-		processSuccess(worker,round, true);
-	}
-	
+	return workDone;
 }
+
 
 function processBlock(worker,round)
 {
@@ -341,7 +348,7 @@ function processBlock(worker,round)
 			if (board[currentStage][currentItem].worker === worker && board[currentStage][currentItem].blocked === false)
 			{
 				board[currentStage][currentItem].blocked = true;
-				workDone = true;
+				//workDone = true;
 				break stageLoopForBlocks;
 			}
 		}
@@ -352,17 +359,17 @@ function processBlock(worker,round)
 
 function selfishApproachToProcessingOneRound(currentRound)
 {
-				for (currentWorker = 0; currentWorker < workers; currentWorker++)
-				{
-					  if (work())
-					  {
-						  processSuccess(currentWorker,currentRound, false);	 
-					  }
-					  else
-					  {
-						  processBlock(currentWorker,currentRound);	          	  
-					  }
-				}
+	for (currentWorker = 0; currentWorker < workers; currentWorker++)
+	{
+		  if (work())
+		  {
+			  processSuccess(currentWorker,currentRound, false);	 
+		  }
+		  else
+		  {
+			  processBlock(currentWorker,currentRound);	          	  
+		  }
+	}
 }
 
 
@@ -370,37 +377,37 @@ function selfishApproachToProcessingOneRound(currentRound)
 function cooperativeApproachToProcessingOneRound(currentRound)
 {
 	
+	var blockedWorkers = [];
+	var unblockedWorkers=[];
+	var currentWorker;
+
 	var successProcessor = function (currentRound) {
 		return function(worker, index,array)
 		{
 			processSuccess(worker,currentRound, false);
 		}		
     }(currentRound);
+
 	var blockProcessor = function (currentRound) {
-	return function(worker, index,array)
-	{
-		processBlock(worker,currentRound, false);
-	}		
+		return function(worker, index,array)
+		{
+			processBlock(worker,currentRound, false);
+		}		
     }(currentRound);
 	
-	var blockedWorkers = [];
-	var unblockedWorkers=[];
-	var currentWorker;
-				for (currentWorker = 0; currentWorker < workers; currentWorker++)
-				{
-					  if (work())
-					  {
-					  	  unblockedWorkers.push(currentWorker);
-						  //processSuccess(currentWorker,currentRound, false);	 
-					  }
-					  else
-					  {
-					  	  blockedWorkers.push(currentWorker);
-						  //processBlock(currentWorker,currentRound);	          	  
-					  }
-				}
-				blockedWorkers.forEach(blockProcessor);
-				unblockedWorkers.forEach(successProcessor);
+	for (currentWorker = 0; currentWorker < workers; currentWorker++)
+	{
+		  if (work())
+		  {
+			  unblockedWorkers.push(currentWorker);
+		  }
+		  else
+		  {
+			  blockedWorkers.push(currentWorker);
+		  }
+	}
+	blockedWorkers.forEach(blockProcessor);
+	unblockedWorkers.forEach(successProcessor);
 				
 }
 
