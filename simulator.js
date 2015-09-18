@@ -28,15 +28,19 @@ function init()
 }
 
 var roll;
+var currentCard = 0;
+var theRandomNumbers = [];
 function initRandomizer(randomizer)
 {
 
 	if (	randomizer === 'cards')
 	{
-		roll= cardRandomizer;
+		theRandomNumbers = shuffle();
+		roll= fixedRandomizer;
 	}	
 	else if (	randomizer === 'fixed')
 	{
+		theRandomNumbers = [6,5,2,2,3,4,1,1,4,4,6,1,6,1,3,3,3,2,5,3,6,2,6,4,4,1,6,1,2,1,6,1,4,5,4,1,5,2,3,2,2,1,5,3,3,1,5,2,6,1,4,1];
 		roll= fixedRandomizer;
 	}	
 	else
@@ -291,16 +295,6 @@ function shuffle()
 	return theCards;
 }
 
-var currentCard = 0;
-
-function cardRandomizer()
-{
-	currentCard = (currentCard% 52);
-	return cards[currentCard++];
-}
-
-var theRandomNumbers = [6,5,2,2,3,4,1,1,4,4,6,1,6,1,3,3,3,2,5,3,6,2,6,4,4,1,6,1,2,1,6,1,4,5,4,1,5,2,3,2,2,1,5,3,3,1,5,2,6,1,4,1];
-
 function fixedRandomizer()
 {
 	currentCard = (currentCard % 52);
@@ -312,9 +306,6 @@ function diceRoller()
 {
 	return Math.floor((Math.random() * 6)) + 1;
 }
-
-//var roll= diceRoller;
-
 
 function work()
 {

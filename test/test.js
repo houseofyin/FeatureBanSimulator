@@ -333,6 +333,7 @@ QUnit.test( "testFixedRandomizer", function( assert ) {
 
    var i;
    var theRandomNumbersToTest = [];
+   initRandomizer('fixed')
    for (i = 0; i < 52; i++)
    {
    	   theRandomNumbersToTest.push(fixedRandomizer());
@@ -353,10 +354,10 @@ QUnit.test( "testCardRandomizer", function( assert ) {
 
    var i;
    var theRandomNumbersToTest = [];
-   cards = shuffle();
+   initRandomizer('cards');
    for (i = 0; i < 52; i++)
    {
-   	   theRandomNumbersToTest.push(cardRandomizer());
+   	   theRandomNumbersToTest.push(fixedRandomizer());
    }   
   for (currentCard = 0; currentCard < 52; currentCard++)
   {
