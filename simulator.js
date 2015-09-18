@@ -303,8 +303,8 @@ var theRandomNumbers = [6,5,2,2,3,4,1,1,4,4,6,1,6,1,3,3,3,2,5,3,6,2,6,4,4,1,6,1,
 
 function fixedRandomizer()
 {
-	currentCard = (currentCard+ 1 % 52);
-	return theRandomNumbers[currentCard];
+	currentCard = (currentCard % 52);
+	return theRandomNumbers[currentCard++];
 }
 
 
