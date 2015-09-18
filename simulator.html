@@ -44,7 +44,14 @@ a cumulative flow diagram of the LAST simulation as an illustration.<p>
 	   <option value="false">False</option>
 	   <option value="true">True</option>
 	</select>There are some differences in outcome based on how well the team works together.  You need to run with a large number of simulations to see the effect reliably.<br> 
+<label for="randomizer">What Random Number Generator to Use:</label>
+	<select  name="randomizer" id="randomizer" >
+	   <option value="die">Dice</option>
+	   <option value="cards">Cards</option>
+	   <option value="fixed">Fixed</option>
+	</select><br> 
 
+	
 <button type="button" id="start" onClick="simulate()">Run Simulation</button>
   
 <h3 id="averageLeadTime"><h3>

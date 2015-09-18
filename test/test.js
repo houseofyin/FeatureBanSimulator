@@ -67,6 +67,7 @@ QUnit.test( "capture cummulative flow metrics", function( assert ) {
 QUnit.test( "init board", function( assert ) {
   var currentTest;
   var currentResult;
+  initRandomizer();
   for (currentTest = 0; currentTest < 100; currentTest++)
   {
   	  currentResult = roll();
@@ -304,6 +305,32 @@ QUnit.test( "processSelfishApproach", function( assert ) {
 
 });	
 
+
+QUnit.test( "shuffle", function( assert ) {
+
+  var shuffledCards = shuffle();
+  var oneCount = 0;
+  var sixCount = 0;
+  var currentCard = 0;
+  assert.equal( shuffledCards.length, 52); 
+  for (currentCard = 0; currentCard < 52; currentCard++)
+  {
+  	  if (shuffledCards[currentCard] === 1)
+  	  {
+  	  	  oneCount++;
+  	  }
+  	  else
+  	  {
+  	  	  sixCount++;
+  	  }
+  }
+  assert.equal( oneCount, 26); 
+  assert.equal( sixCount, 26); 
+
+});	
+
+//TODO Test the Randomizer 
+ 
 //TODO Test Selfish v Cooperative
 
 	

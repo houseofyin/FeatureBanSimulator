@@ -27,6 +27,24 @@ function init()
 	totalLeadTime = 0.0;			
 }
 
+var roll;
+function initRandomizer(randomizer)
+{
+
+	if (	randomizer === 'cards')
+	{
+		roll= cardRandomizer;
+	}	
+	else if (	randomizer === 'fixed')
+	{
+		roll= fixedRandomizer;
+	}	
+	else
+	{
+		roll= diceRoller;
+	}
+}
+
 function parseWipLimits(userInput)
 {
     var theWipLimits = [200];
@@ -231,10 +249,72 @@ function displayBoard()
 	$("#board").html("Board:" + displayString);
 }
 
-function roll()
+var cards = [];
+
+function shuffle()
+{
+	var theCards = [];
+	var blackCount = 0;
+	var redCount = 0;
+	var currentCard;
+	var currentRoll;
+	for (currentCard = 0; currentCard < 52; currentCard++)
+	{
+		currentRoll = diceRoller();
+		if (currentRoll <= 3)
+		{
+			if (blackCount < 26)
+			{
+				theCards.push(1);
+				blackCount++;
+			}
+			else if (redCount < 26)
+			{
+				theCards.push(6);
+				redCount++;
+			}
+		}
+		else
+		{
+			if (redCount < 26)
+			{
+				theCards.push(6);
+				redCount++;
+			}
+			else if (blackCount < 26)
+			{
+				theCards.push(1);
+				blackCount++;
+			}
+		}
+	}
+	return theCards;
+}
+
+var currentCard = 0;
+
+function cardRandomizer()
+{
+	currentCard = (currentCard+ 1 % 52);
+	return cards[currentCard];
+}
+
+var theRandomNumbers = [6,5,2,2,3,4,1,1,4,4,6,1,6,1,3,3,3,2,5,3,6,2,6,4,4,1,6,1,2,1,6,1,4,5,4,1,5,2,3,2,2,1,5,3,3,1,5,2,6,1,4,1];
+
+function fixedRandomizer()
+{
+	currentCard = (currentCard+ 1 % 52);
+	return theRandomNumbers[currentCard];
+}
+
+
+function diceRoller()
 {
 	return Math.floor((Math.random() * 6)) + 1;
 }
+
+//var roll= diceRoller;
+
 
 function work()
 {
@@ -417,6 +497,7 @@ function simulate()
 	var currentWorker;
 	try {
 		init();
+		initRandomizer($("#randomizer").val());
 		for (currentSimulation = 0; currentSimulation < simulations; currentSimulation++)
 		{
 			initBoard();
