@@ -342,14 +342,25 @@ QUnit.test( "testFixedRandomizer", function( assert ) {
    	    assert.equal( theRandomNumbers[i], theRandomNumbersToTest[i]); 
    }
 		
+});
+
+QUnit.test( "testCardRandomizer", function( assert ) {
+
   var shuffledCards = shuffle();
   var oneCount = 0;
   var sixCount = 0;
   var currentCard = 0;
-  assert.equal( shuffledCards.length, 52); 
+
+   var i;
+   var theRandomNumbersToTest = [];
+   cards = shuffle();
+   for (i = 0; i < 52; i++)
+   {
+   	   theRandomNumbersToTest.push(cardRandomizer());
+   }   
   for (currentCard = 0; currentCard < 52; currentCard++)
   {
-  	  if (shuffledCards[currentCard] === 1)
+  	  if (theRandomNumbersToTest[currentCard] === 1)
   	  {
   	  	  oneCount++;
   	  }
@@ -363,7 +374,6 @@ QUnit.test( "testFixedRandomizer", function( assert ) {
 
 });	
 
-//TODO Test the Randomizer 
  
 //TODO Test Selfish v Cooperative
 

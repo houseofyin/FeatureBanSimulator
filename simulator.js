@@ -295,8 +295,8 @@ var currentCard = 0;
 
 function cardRandomizer()
 {
-	currentCard = (currentCard+ 1 % 52);
-	return cards[currentCard];
+	currentCard = (currentCard% 52);
+	return cards[currentCard++];
 }
 
 var theRandomNumbers = [6,5,2,2,3,4,1,1,4,4,6,1,6,1,3,3,3,2,5,3,6,2,6,4,4,1,6,1,2,1,6,1,4,5,4,1,5,2,3,2,2,1,5,3,3,1,5,2,6,1,4,1];
