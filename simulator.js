@@ -49,6 +49,7 @@ function init()
 }
 
 var roll;
+
 var currentCard = 0;
 var theRandomNumbers = [];
 function initRandomizer(randomizer)
@@ -103,6 +104,7 @@ function initBoard()
 	var currentStage;
 	var currentWorkItem;
 	var currentRound;
+        
 	board = [];
 	cummulativeFlowMetrics = [];
 	for (currentRound = 0; currentRound < rounds; currentRound++)
@@ -515,6 +517,7 @@ function simulate()
 			initBoard();
 			for (currentRound = 0; currentRound < rounds; currentRound++)
 			{
+                                currentCard = 0;
 				if (teamCollaboration)
 				{
 					cooperativeApproachToProcessingOneRound(currentRound);
