@@ -46,7 +46,7 @@ a cumulative flow diagram of the LAST simulation as an illustration.<p>
 <h3 id="parameters">Simulation Parameters</h3>
 
  <label for="stages">Stages:</label>
-  <input type="text" name="stages" id="stages" value="4">How many stages should be on the Kanban board.<br>
+  <input type="text" name="stages" id="stages" value="5">How many stages should be on the Kanban board.  Include 1 to cover the backlog.<br>
 <label for="rounds">Rounds:</label>
   <input type="text" name="rounds" id="rounds" value="10">How many rounds of die-rolling should be included in each simulation.<br>
 <label for="minimumToUnblock">Minimum to Succeed:</label>
@@ -58,7 +58,7 @@ a cumulative flow diagram of the LAST simulation as an illustration.<p>
 <label for="simulations">Number of Simulations:</label>
 	<input type="text" name="simulations" id="simulations" value="100">How many times the simulation should be run.  If you are only interested in the cummulative flow diagram, 1 is sufficient.  The metrics stablize around 1000 simulations.<br>
 <label for="wipLimits">WiPLimits (Comma Separated):</label>
-	<input type="text" name="wipLimits" id="wipLimits" value="35,35">A comma separated list of WiP limits for all of the stages, except for the first and the last.  E.g. if there are 4 stages selected above, there should be two listed here.  The defaults are set to be high enough that there should be in practice no effective limits.<br>
+	<input type="text" name="wipLimits" id="wipLimits" value="35,35,35">A comma separated list of WiP limits for all of the stages, except for the first (i.e the backlog) and the last (i.e. completed work).  E.g. if there are 5 stages selected above, there should be 3 listed here.  The defaults are set to be high enough that there should be in practice no effective limits.<br>
 <label for="collaboation">Use Team Collaboration to Optimize Order of Work:</label>
 	<select  name="collaboation" id="collaboation" >
 	   <option value="false">False</option>
