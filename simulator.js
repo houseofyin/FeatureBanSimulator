@@ -32,6 +32,8 @@ var cummulativeFlowMetrics;
 var totalNumberOfItems;
 var wipLimits;
 var teamCollaboration;
+var defaultColors;
+var tunedColors;
 
 function init()
 {
@@ -46,6 +48,8 @@ function init()
 	teamCollaboration  = $("#collaboation").val() === 'true';
 	totalFinished = 0;
 	totalLeadTime = 0.0;			
+        defaultColors = ["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"];
+        tunedColors = defaultColors;
 }
 
 var roll;
@@ -165,8 +169,10 @@ data = data.map(
 		});
 	});
 
-
-var colors = d3.scale.category10();
+tunedColors[stages-1] = "#ffffff";
+var colors = d3.scale.ordinal()
+      .domain(["0","1","2","3","4","5","6","7","8","9"])
+      .range(tunedColors);
 
 var x = d3.scale.linear()
     .range([0, width])
@@ -218,8 +224,8 @@ svg.append("text")
 svg.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .style("stroke", "white")
-    .style("fill", "white")
+    .style("stroke", "black")
+    .style("fill", "black")
     .attr("x", -15)
     .attr("y", width-20)
     .attr("dy", ".75em")
