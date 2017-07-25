@@ -447,7 +447,10 @@ function processBlock(worker,round)
 			}
 		}
 	}
-	startNewWorkItem(worker,round);
+        if (!startNewWorkItem(worker,round))
+        {
+             processMove(worker, round, true);
+        }
 }
 
 
